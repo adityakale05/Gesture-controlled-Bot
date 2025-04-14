@@ -6,13 +6,11 @@
 #define AIN2 25
 #define PWMA 33  
 
-// Motor B pins
 #define BIN1 14
 #define BIN2 12
 #define PWMB 13  
 
 #define STDBY 27
-
 
 #define PWM_CHANNEL_A 0
 #define PWM_CHANNEL_B 1
@@ -24,9 +22,8 @@ void forward(int spd);
 void back(int spd);
 void stop();
 
-
-const char* ssid = "Robot";
-const char* password = "adk05eie";
+const char* ssid = "NAME_OF_AP";
+const char* password = "PASSWORD_AP";
 
 IPAddress local_IP(192, 168, 4, 1);
 IPAddress gateway(192, 168, 4, 1);
@@ -42,26 +39,28 @@ int packetSize = 0;
 
 
 void setup() {
-    Serial.begin(9600);
-    WiFi.mode(WIFI_AP);
-    WiFi.softAPConfig(local_IP, gateway, subnet);
-    WiFi.softAP(ssid, password);
-    Serial.println(WiFi.softAPIP());  
+  Serial.begin(9600);
+  WiFi.mode(WIFI_AP);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+  WiFi.softAP(ssid, password);
+  Serial.println(WiFi.softAPIP());  
 
-    udp.begin(udpPort);
-    Serial.println("UDP server started");
+  udp.begin(udpPort);
+  Serial.println("UDP server started");
 
-    pinMode(AIN1, OUTPUT);
-    pinMode(AIN2, OUTPUT);
-    pinMode(PWMA, OUTPUT);
-    pinMode(STDBY, OUTPUT);
-    pinMode(BIN1, OUTPUT);
-    pinMode(BIN2, OUTPUT);
-    pinMode(PWMB, OUTPUT);
-  
-    ledcAttach(PWM_CHANNEL_A, 1000, 8);
-    ledcAttach(PWM_CHANNEL_B, 1000, 8);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+  pinMode(PWMA, OUTPUT);
+  pinMode(STDBY, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+  pinMode(PWMB, OUTPUT);
 
+  ledcSetup(PWM_CHANNEL_A, 1000, 8);
+  ledcAttachPin(PWMA, PWM_CHANNEL_A);
+
+  ledcSetup(PWM_CHANNEL_B, 1000, 8); 
+  ledcAttachPin(PWMB, PWM_CHANNEL_B);
 }
 
 void loop() {
@@ -98,12 +97,12 @@ void loop() {
         stop();
         Serial.println("Stop");
       } 
-      delay(300);
+      delay(100);
   }
   else{
     stop();
     Serial.println("Data not recieved");
-    delay(300);
+    delay(100);
   }
 }
 
@@ -118,12 +117,12 @@ void runMotor(int motor, int spd, int dir) {
     dirPin2 = LOW;
   }
 
-  if(motor == 0) {  
+  if(motor == 0) {  // Motor A
     digitalWrite(AIN1, dirPin1);
     digitalWrite(AIN2, dirPin2);
     ledcWrite(PWM_CHANNEL_A, spd);
   } 
-  else {          
+  else {          // Motor B
     digitalWrite(BIN1, dirPin1);
     digitalWrite(BIN2, dirPin2);
     ledcWrite(PWM_CHANNEL_B, spd);
